@@ -1,0 +1,10 @@
+*
+!.gitignore
+!Conv_C_FP16/
+!Conv_C_FP16/**
+!Conv_C_INT8/
+!Conv_C_INT8/**
+!Conv_RTL_FP16/
+!Conv_RTL_FP16/**
+!Conv_RTL_INT8/
+!Conv_RTL_INT8/**
