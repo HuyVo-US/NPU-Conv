@@ -34,6 +34,12 @@ input wire signed [7:0] src1_readdata
 input wire signed [7:0] src2_readdata
 ```
 
+Kernel buffer noi bo co kich thuoc dung `3 x 3`:
+
+```verilog
+reg signed [7:0] kernel [0:KERNEL_ROWS-1][0:KERNEL_COLS-1];
+```
+
 Output convolution la signed INT32:
 
 ```verilog
@@ -127,7 +133,7 @@ fffffff0 0000000e 00000020
 `conv_trace.log` dung dang key-value de de doc tung lan ghi output:
 
 ```text
-WRITE[1] time=430ns address=0 row=0 col=0 data=0000004e state=4 next_state=3 start=0 done=0 src1_addr=58 src1_data=02 src2_addr=9 src2_data=00 dest_we=1 i=0 j=0 m=0 n=0 product=fff8 sum=0000004e
+WRITE[1] time=430ns address=0 row=0 col=0 data=0000004e state=4 next_state=3 start=0 done=0 src1_addr=58 src1_data=02 src2_addr=9 src2_data=00 dest_we=1 kernel_row=0 kernel_col=0 output_row_idx=0 output_col_idx=0 product=fff8 sum=0000004e
 ```
 
 Trong do:
@@ -135,6 +141,8 @@ Trong do:
 - `address`: dia chi ghi output.
 - `row`, `col`: toa do output.
 - `data`: gia tri signed INT32 ghi ra output SRAM.
+- `kernel_row`, `kernel_col`: chi so phan tu kernel dang tinh.
+- `output_row_idx`, `output_col_idx`: chi so cua cua so convolution hien tai.
 - `product`: tich signed 16-bit hien tai.
 - `sum`: accumulator signed 32-bit hien tai.
 

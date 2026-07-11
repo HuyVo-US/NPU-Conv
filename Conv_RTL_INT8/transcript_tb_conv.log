@@ -2,52 +2,52 @@
 # vmap work work 
 # Modifying D:/Huy/KLTN-MT_HTN/Neural_Processing_Unit_on_FPGA_analysis/Conv_RTL_INT8/Conv_RTL_INT8.mpf
 # Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
-# Start time: 20:20:27 on Jul 05,2026
+# Start time: 23:22:35 on Jul 11,2026
 # vlog -reportprogress 300 -work work INT8_MULT.v 
 # -- Compiling module int8Mult
 # 
 # Top level modules:
 # 	int8Mult
-# End time: 20:20:27 on Jul 05,2026, Elapsed time: 0:00:00
+# End time: 23:22:35 on Jul 11,2026, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
-# Start time: 20:20:27 on Jul 05,2026
+# Start time: 23:22:35 on Jul 11,2026
 # vlog -reportprogress 300 -work work INT8_ADD.v 
 # -- Compiling module int8Add
 # 
 # Top level modules:
 # 	int8Add
-# End time: 20:20:27 on Jul 05,2026, Elapsed time: 0:00:00
+# End time: 23:22:35 on Jul 11,2026, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
-# Start time: 20:20:27 on Jul 05,2026
+# Start time: 23:22:35 on Jul 11,2026
 # vlog -reportprogress 300 -work work Conv.v 
 # -- Compiling module matrix_conv
 # 
 # Top level modules:
 # 	matrix_conv
-# End time: 20:20:28 on Jul 05,2026, Elapsed time: 0:00:01
+# End time: 23:22:35 on Jul 11,2026, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
-# Start time: 20:20:28 on Jul 05,2026
+# Start time: 23:22:35 on Jul 11,2026
 # vlog -reportprogress 300 -work work sram.v 
 # -- Compiling module M10K_sram
 # 
 # Top level modules:
 # 	M10K_sram
-# End time: 20:20:28 on Jul 05,2026, Elapsed time: 0:00:00
+# End time: 23:22:35 on Jul 11,2026, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
-# Start time: 20:20:28 on Jul 05,2026
+# Start time: 23:22:35 on Jul 11,2026
 # vlog -reportprogress 300 -work work tb_conv.v 
 # -- Compiling module tb_conv
 # 
 # Top level modules:
 # 	tb_conv
-# End time: 20:20:28 on Jul 05,2026, Elapsed time: 0:00:00
+# End time: 23:22:35 on Jul 11,2026, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # vsim -t 1ns work.tb_conv 
-# Start time: 20:20:28 on Jul 05,2026
+# Start time: 23:22:36 on Jul 11,2026
 # Loading work.tb_conv
 # Loading work.matrix_conv
 # Loading work.int8Mult
@@ -58,5 +58,5 @@
 #    Time: 148970 ns  Iteration: 0  Instance: /tb_conv
 # 1
 # Break in Module tb_conv at tb_conv.v line 252
-# End time: 20:20:49 on Jul 05,2026, Elapsed time: 0:00:21
+# End time: 23:23:27 on Jul 11,2026, Elapsed time: 0:00:51
 # Errors: 0, Warnings: 1

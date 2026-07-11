@@ -226,7 +226,7 @@ module tb_conv;
         dump_input_data();
         dump_kernel_data();
         $fdisplay(trace_file,
-            "# WRITE[index] time=<time>ns address=<dest_addr> row=<output_row> col=<output_col> data=<dest_data> state=<state> next_state=<next_state> start=<start> done=<done> src1_addr=<src1_addr> src1_data=<src1_data> src2_addr=<src2_addr> src2_data=<src2_data> dest_we=<dest_we> i=<i> j=<j> m=<m> n=<n> product=<product> sum=<sum>");
+            "# WRITE[index] time=<time>ns address=<dest_addr> row=<output_row> col=<output_col> data=<dest_data> state=<state> next_state=<next_state> start=<start> done=<done> src1_addr=<src1_addr> src1_data=<src1_data> src2_addr=<src2_addr> src2_data=<src2_data> dest_we=<dest_we> kernel_row=<kernel_row_index> kernel_col=<kernel_col_index> output_row_idx=<output_row_index> output_col_idx=<output_col_index> product=<product> sum=<sum>");
 
         #10;
         reset = 1;
@@ -262,7 +262,7 @@ module tb_conv;
             output_count = output_count + 1;
 
             $fdisplay(trace_file,
-                "WRITE[%0d] time=%0tns address=%0d row=%0d col=%0d data=%08h state=%0d next_state=%0d start=%0b done=%0b src1_addr=%0d src1_data=%02h src2_addr=%0d src2_data=%02h dest_we=%0b i=%0d j=%0d m=%0d n=%0d product=%04h sum=%08h",
+                "WRITE[%0d] time=%0tns address=%0d row=%0d col=%0d data=%08h state=%0d next_state=%0d start=%0b done=%0b src1_addr=%0d src1_data=%02h src2_addr=%0d src2_data=%02h dest_we=%0b kernel_row=%0d kernel_col=%0d output_row_idx=%0d output_col_idx=%0d product=%04h sum=%08h",
                 output_count,
                 $time,
                 conv_dest_address,
@@ -278,10 +278,10 @@ module tb_conv;
                 conv_src2_address,
                 conv_src2_readdata,
                 conv_dest_write_en,
-                uut.i,
-                uut.j,
-                uut.m,
-                uut.n,
+                uut.kernel_row_index,
+                uut.kernel_col_index,
+                uut.output_row_index,
+                uut.output_col_index,
                 uut.product,
                 uut.sum);
         end

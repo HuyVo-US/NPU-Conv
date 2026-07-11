@@ -9,7 +9,7 @@ z2
 cModel Technology
 Z0 dD:/Huy/KLTN-MT_HTN/Neural_Processing_Unit_on_FPGA_analysis/Conv_RTL_FP16
 vfloatAdd
-Z1 !s110 1783229226
+Z1 !s110 1783786609
 !i10b 1
 !s100 z=WHPYQbK>MzFWMG5mC6g0
 IzHaAkD3ULj8FE?cYkMiS53
@@ -23,7 +23,7 @@ Z4 OV;L;10.5b;63
 r1
 !s85 0
 31
-Z5 !s108 1783229226.000000
+Z5 !s108 1783786609.000000
 !s107 FP16_ADD.v|
 !s90 -reportprogress|300|-work|work|FP16_ADD.v|
 !i113 1

@@ -9,7 +9,7 @@ z2
 cModel Technology
 Z0 dD:/Huy/KLTN-MT_HTN/Neural_Processing_Unit_on_FPGA_analysis/Conv_RTL_INT8
 vint8Add
-Z1 !s110 1783257627
+Z1 !s110 1783786955
 !i10b 1
 !s100 D?>VdSjfH@1@1<nf`17F52
 IKlnGaC8j8L2Toad9He`6=1
@@ -23,7 +23,7 @@ Z3 OV;L;10.5b;63
 r1
 !s85 0
 31
-Z4 !s108 1783257627.000000
+Z4 !s108 1783786955.000000
 !s107 INT8_ADD.v|
 !s90 -reportprogress|300|-work|work|INT8_ADD.v|
 !i113 1
@@ -53,7 +53,7 @@ R5
 R6
 nint8@mult
 vM10K_sram
-Z7 !s110 1783257628
+R1
 !i10b 1
 !s100 6CbG2DdenBHEX8eoAC8H<0
 IBa2cb0LdkY9mK<7cZNhQO3
@@ -67,7 +67,7 @@ R3
 r1
 !s85 0
 31
-Z8 !s108 1783257628.000000
+R4
 !s107 sram.v|
 !s90 -reportprogress|300|-work|work|sram.v|
 !i113 1
@@ -75,13 +75,13 @@ R5
 R6
 n@m10@k_sram
 vmatrix_conv
-R7
+R1
 !i10b 1
-!s100 SJzXHGcb9Z8KhIji_XbQk1
-I6j=HYlmkZj=[@D2WU0FhT3
+!s100 glIBz13XZm?_=YIU3g0110
+I_SfH`@aMaLFO5N>APVOib2
 R2
 R0
-w1783255896
+w1783758191
 8Conv.v
 FConv.v
 L0 1
@@ -96,13 +96,13 @@ R4
 R5
 R6
 vtb_conv
-R7
+R1
 !i10b 1
-!s100 4F^N88NEOT:OiI]]bfdZ^2
-ImTd:C7ABJkLWg?]PGUfKX3
+!s100 `bj[`bYHMde<l?3bag^i82
+IcQcRUml`ojQSkALfWkizl3
 R2
 R0
-w1783255899
+w1783757374
 8tb_conv.v
 Ftb_conv.v
 L0 3
@@ -110,7 +110,7 @@ R3
 r1
 !s85 0
 31
-R8
+R4
 !s107 tb_conv.v|
 !s90 -reportprogress|300|-work|work|tb_conv.v|
 !i113 1
