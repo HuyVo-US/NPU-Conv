@@ -1,10 +1,9 @@
-module int8Add
-(
-    input wire signed [31:0] accA,
-    input wire signed [15:0] productB,
+module int8_add (
+    input wire signed [31:0] accumulator,
+    input wire signed [15:0] product,
     output wire signed [31:0] sum
 );
 
-assign sum = accA + {{16{productB[15]}}, productB};
+    assign sum = accumulator + {{16{product[15]}}, product};
 
 endmodule

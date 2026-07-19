@@ -2,27 +2,6 @@
 
 module tb_conv;
 
-    integer input_file;
-    integer kernel_file;
-    integer output_file;
-    integer trace_file;
-    integer row;
-    integer col;
-    integer output_count;
-    integer output_row_size;
-    integer output_col_size;
-    integer output_index;
-    integer output_row;
-    integer output_col;
-    integer output_addr_offset;
-
-    reg [15:0] output_mem [0:1023];
-
-    localparam INPUT_HEX_FILE = "input.hex";
-    localparam KERNEL_HEX_FILE = "kernel.hex";
-    localparam OUTPUT_HEX_FILE = "output.hex";
-    localparam TRACE_LOG_FILE = "conv_trace.log";
-
     reg clk;
     reg clk_300;
     reg reset;
@@ -33,6 +12,9 @@ module tb_conv;
     wire [13:0] conv_src1_address;
     wire [15:0] conv_src1_readdata;
     wire [15:0] conv_src2_readdata;
+    wire [15:0] sram_src1_readdata;
+    wire [15:0] sram_src2_readdata;
+    wire [15:0] debug_kernel_value;
     wire [15:0] conv_src1_writedata;
     wire conv_src1_write_en;
     wire [13:0] conv_src2_address;
@@ -47,6 +29,87 @@ module tb_conv;
     reg [5:0] conv_src2_row_size;
     reg [5:0] conv_src2_col_size;
     reg [13:0] conv_dest_start_address;
+
+    integer process_log_file;
+    integer write_count;
+    reg process_log_enable;
+
+    function automatic [15:0] uint16_to_fp16;
+        input [15:0] value;
+        integer bit_index;
+        integer msb_index;
+        integer shift_amount;
+        reg [11:0] rounded_significand;
+        reg [15:0] remainder;
+        reg [15:0] halfway;
+        reg [4:0] exponent_field;
+        reg [9:0] mantissa_field;
+        begin
+            if (^value === 1'bx) begin
+                uint16_to_fp16 = 16'hxxxx;
+            end
+            else if (value == 16'd0) begin
+                uint16_to_fp16 = 16'h0000;
+            end
+            else begin
+                msb_index = -1;
+                for (bit_index = 15; bit_index >= 0; bit_index = bit_index - 1) begin
+                    if ((msb_index == -1) && value[bit_index]) begin
+                        msb_index = bit_index;
+                    end
+                end
+
+                if (msb_index <= 10) begin
+                    exponent_field = msb_index + 15;
+                    mantissa_field = value << (10 - msb_index);
+                    uint16_to_fp16 = {1'b0, exponent_field, mantissa_field};
+                end
+                else begin
+                    shift_amount = msb_index - 10;
+                    rounded_significand = value >> shift_amount;
+                    remainder = value & ((16'h0001 << shift_amount) - 1'b1);
+                    halfway = 16'h0001 << (shift_amount - 1);
+
+                    if ((remainder > halfway) ||
+                        ((remainder == halfway) && rounded_significand[0])) begin
+                        rounded_significand = rounded_significand + 1'b1;
+                    end
+
+                    if (rounded_significand[11]) begin
+                        msb_index = msb_index + 1;
+                        rounded_significand = 12'd1024;
+                    end
+
+                    if ((msb_index + 15) >= 31) begin
+                        uint16_to_fp16 = 16'h7c00;
+                    end
+                    else begin
+                        exponent_field = msb_index + 15;
+                        mantissa_field = rounded_significand[9:0];
+                        uint16_to_fp16 = {1'b0, exponent_field, mantissa_field};
+                    end
+                end
+            end
+        end
+    endfunction
+
+    function [8*11-1:0] conv_state_name;
+        input [2:0] state_value;
+        begin
+            case (state_value)
+                3'd0: conv_state_name = "IDLE";
+                3'd1: conv_state_name = "READ_KERNEL";
+                3'd2: conv_state_name = "CALC";
+                3'd3: conv_state_name = "SLIDE";
+                3'd4: conv_state_name = "WRITE";
+                3'd5: conv_state_name = "DONE";
+                default: conv_state_name = "UNKNOWN";
+            endcase
+        end
+    endfunction
+
+    assign conv_src1_readdata = uint16_to_fp16(sram_src1_readdata);
+    assign conv_src2_readdata = uint16_to_fp16(sram_src2_readdata);
 
 
     matrix_conv uut (
@@ -75,10 +138,12 @@ module tb_conv;
         .dest_write_en(conv_dest_write_en)
     );
 
+    assign debug_kernel_value = uut.kernel[uut.i][uut.j];
+
     M10K_sram src1(
         .clk(clk_300),
         .we(conv_src1_write_en),
-        .q(conv_src1_readdata),
+        .q(sram_src1_readdata),
         .d(conv_src1_writedata),
         .address(conv_src1_address)
     );
@@ -86,7 +151,7 @@ module tb_conv;
     M10K_sram src2(
         .clk(clk_300),
         .we(conv_src2_write_en),
-        .q(conv_src2_readdata),
+        .q(sram_src2_readdata),
         .d(conv_src2_writedata),
         .address(conv_src2_address)
     );
@@ -99,104 +164,144 @@ module tb_conv;
         .address(conv_dest_address)
     );
 
-    function [15:0] int_to_fp16;
-        input integer value;
-        integer msb;
-        integer exponent;
-        reg [31:0] temp;
-        reg [10:0] normalized;
+    task dump_input_matrix;
+        integer file_handle;
+        integer row_index;
+        integer col_index;
+        integer memory_address;
         begin
-            if (value <= 0) begin
-                int_to_fp16 = 16'h0000;
+            file_handle = $fopen("conv_input.hex", "w");
+            if (file_handle == 0) begin
+                $display("ERROR: Cannot open conv_input.hex");
+                $finish;
             end
-            else begin
-                temp = value;
-                msb = 0;
-                while (temp > 1) begin
-                    temp = temp >> 1;
-                    msb = msb + 1;
-                end
 
-                exponent = msb + 15;
-                if (msb > 10) begin
-                    normalized = value >> (msb - 10);
+            for (row_index = 0; row_index < conv_src1_row_size; row_index = row_index + 1) begin
+                memory_address = conv_src1_start_address + row_index * conv_src1_col_size;
+                for (col_index = 0; col_index < conv_src1_col_size; col_index = col_index + 1) begin
+                    $fwrite(file_handle, "%04h",
+                            uint16_to_fp16(src1.mem[memory_address + col_index]));
+                    if (col_index == conv_src1_col_size - 1)
+                        $fwrite(file_handle, "\n");
+                    else
+                        $fwrite(file_handle, " ");
                 end
-                else begin
-                    normalized = value << (10 - msb);
-                end
-
-                int_to_fp16 = {1'b0, exponent[4:0], normalized[9:0]};
             end
+            $fclose(file_handle);
         end
-    endfunction
+    endtask
 
-    task init_fp16_test_data;
+    task dump_kernel_matrix;
+        integer file_handle;
+        integer row_index;
+        integer col_index;
+        integer memory_address;
         begin
-            for (row = 0; row < conv_src1_row_size; row = row + 1) begin
-                for (col = 0; col < conv_src1_col_size; col = col + 1) begin
-                    src1.mem[conv_src1_start_address + row * conv_src1_col_size + col] =
-                        int_to_fp16(row * conv_src1_col_size + col + 1);
-                end
+            file_handle = $fopen("conv_kernel.hex", "w");
+            if (file_handle == 0) begin
+                $display("ERROR: Cannot open conv_kernel.hex");
+                $finish;
             end
 
-            for (row = 0; row < conv_src2_row_size; row = row + 1) begin
-                for (col = 0; col < conv_src2_col_size; col = col + 1) begin
-                    src2.mem[conv_src2_start_address + row * conv_src2_col_size + col] =
-                        int_to_fp16(row * conv_src2_col_size + col + 1);
+            for (row_index = 0; row_index < conv_src2_row_size; row_index = row_index + 1) begin
+                memory_address = conv_src2_start_address + row_index * conv_src2_col_size;
+                for (col_index = 0; col_index < conv_src2_col_size; col_index = col_index + 1) begin
+                    $fwrite(file_handle, "%04h",
+                            uint16_to_fp16(src2.mem[memory_address + col_index]));
+                    if (col_index == conv_src2_col_size - 1)
+                        $fwrite(file_handle, "\n");
+                    else
+                        $fwrite(file_handle, " ");
                 end
+            end
+            $fclose(file_handle);
+        end
+    endtask
+
+    task clear_output_matrix;
+        integer output_rows;
+        integer output_cols;
+        integer output_index;
+        begin
+            output_rows = conv_src1_row_size - conv_src2_row_size + 1;
+            output_cols = conv_src1_col_size - conv_src2_col_size + 1;
+            for (output_index = 0; output_index < output_rows * output_cols;
+                 output_index = output_index + 1) begin
+                dest.mem[conv_dest_start_address + output_index] = 16'hxxxx;
             end
         end
     endtask
 
-    task dump_input_data;
+    task dump_output_matrix;
+        integer file_handle;
+        integer output_rows;
+        integer output_cols;
+        integer row_index;
+        integer col_index;
+        integer memory_address;
         begin
-            for (row = 0; row < conv_src1_row_size; row = row + 1) begin
-                for (col = 0; col < conv_src1_col_size; col = col + 1) begin
-                    if (col == conv_src1_col_size - 1) begin
-                        $fdisplay(input_file, "%04h",
-                            src1.mem[conv_src1_start_address + row * conv_src1_col_size + col]);
-                    end
-                    else begin
-                        $fwrite(input_file, "%04h ",
-                            src1.mem[conv_src1_start_address + row * conv_src1_col_size + col]);
-                    end
+            output_rows = conv_src1_row_size - conv_src2_row_size + 1;
+            output_cols = conv_src1_col_size - conv_src2_col_size + 1;
+            file_handle = $fopen("conv_output.hex", "w");
+            if (file_handle == 0) begin
+                $display("ERROR: Cannot open conv_output.hex");
+                $finish;
+            end
+
+            for (row_index = 0; row_index < output_rows; row_index = row_index + 1) begin
+                memory_address = conv_dest_start_address + row_index * output_cols;
+                for (col_index = 0; col_index < output_cols; col_index = col_index + 1) begin
+                    $fwrite(file_handle, "%04h", dest.mem[memory_address + col_index]);
+                    if (col_index == output_cols - 1)
+                        $fwrite(file_handle, "\n");
+                    else
+                        $fwrite(file_handle, " ");
                 end
             end
+            $fclose(file_handle);
         end
     endtask
 
-    task dump_kernel_data;
-        begin
-            for (row = 0; row < conv_src2_row_size; row = row + 1) begin
-                for (col = 0; col < conv_src2_col_size; col = col + 1) begin
-                    if (col == conv_src2_col_size - 1) begin
-                        $fdisplay(kernel_file, "%04h",
-                            src2.mem[conv_src2_start_address + row * conv_src2_col_size + col]);
-                    end
-                    else begin
-                        $fwrite(kernel_file, "%04h ",
-                            src2.mem[conv_src2_start_address + row * conv_src2_col_size + col]);
-                    end
-                end
-            end
+    always @(posedge clk) begin
+        if (process_log_enable && (process_log_file != 0) &&
+            (conv_dest_write_en === 1'b1)) begin
+            write_count = write_count + 1;
+            $fwrite(process_log_file,
+                    "%0s[%0d] time=%0dns address=%0d output_row=%0d output_col=%0d data=%04h state=%0d next_state=%0d start=%b done=%b src1_addr=%0d src1_data=%04h src2_addr=%0d src2_data=%04h dest_we=%b kernel_row=%0d kernel_col=%0d product=%04h sum=%04h\n",
+                    conv_state_name(uut.state), write_count,
+                    $time, conv_dest_address, uut.m, uut.n,
+                    conv_dest_writedata, uut.state, uut.next_state,
+                    conv_start, conv_done, conv_src1_address,
+                    conv_src1_readdata, conv_src2_address,
+                    conv_src2_readdata, conv_dest_write_en,
+                    uut.i, uut.j, uut.product, uut.sum);
         end
-    endtask
+    end
 
-    task dump_output_data;
-        begin
-            for (row = 0; row < output_row_size; row = row + 1) begin
-                for (col = 0; col < output_col_size; col = col + 1) begin
-                    output_index = row * output_col_size + col;
-                    if (col == output_col_size - 1) begin
-                        $fdisplay(output_file, "%04h", output_mem[output_index]);
-                    end
-                    else begin
-                        $fwrite(output_file, "%04h ", output_mem[output_index]);
-                    end
-                end
-            end
+    initial begin
+        write_count = 0;
+        process_log_enable = 1;
+        process_log_file = $fopen("conv_internal_process.log", "w");
+        if (process_log_file == 0) begin
+            $display("ERROR: Cannot open conv_internal_process.log");
+            $finish;
         end
-    endtask
+        #1;
+        dump_input_matrix;
+        dump_kernel_matrix;
+        clear_output_matrix;
+
+        wait (reset === 1'b0);
+        wait (conv_done === 1'b0);
+        wait (conv_done === 1'b1);
+        repeat (2) @(posedge clk_300);
+
+        dump_output_matrix;
+        process_log_enable = 0;
+        $fclose(process_log_file);
+        $display("Convolution logs written: conv_input.hex, conv_kernel.hex, conv_output.hex, conv_internal_process.log");
+        $finish;
+    end
 
     initial begin
         clk = 0;
@@ -209,21 +314,6 @@ module tb_conv;
     end
 
     initial begin
-        input_file = $fopen(INPUT_HEX_FILE, "w");
-        kernel_file = $fopen(KERNEL_HEX_FILE, "w");
-        output_file = $fopen(OUTPUT_HEX_FILE, "w");
-        trace_file = $fopen(TRACE_LOG_FILE, "w");
-
-        if (input_file == 0 || kernel_file == 0 || output_file == 0 || trace_file == 0) begin
-            $display("ERROR: Could not open one or more output files.");
-            $finish;
-        end
-
-        output_count = 0;
-        for (output_index = 0; output_index < 1024; output_index = output_index + 1) begin
-            output_mem[output_index] = 16'h0000;
-        end
-
         reset = 1;
         conv_start = 0;
         conv_src1_start_address = 0;
@@ -233,14 +323,7 @@ module tb_conv;
         conv_src2_row_size = 3;
         conv_src2_col_size = 3;
         conv_dest_start_address = 0;
-        output_row_size = conv_src1_row_size - conv_src2_row_size + 1;
-        output_col_size = conv_src1_col_size - conv_src2_col_size + 1;
 
-        init_fp16_test_data();
-        dump_input_data();
-        dump_kernel_data();
-        $fdisplay(trace_file,
-            "# WRITE[index] time=<time>ns address=<dest_addr> row=<output_row> col=<output_col> data=<dest_data> state=<state> next_state=<next_state> start=<start> done=<done> src1_addr=<src1_addr> src1_data=<src1_data> src2_addr=<src2_addr> src2_data=<src2_data> dest_we=<dest_we> i=<i> j=<j> m=<m> n=<n> product=<product> sum=<sum>");
 
         #10;
         reset = 1;
@@ -253,52 +336,6 @@ module tb_conv;
         #10;
         conv_start = 0;
 
-        wait (conv_done == 0);
-        wait (conv_done == 1);
-        #40;
-
-        dump_output_data();
-
-        $fclose(input_file);
-        $fclose(kernel_file);
-        $fclose(output_file);
-        $fclose(trace_file);
-        $finish;
-
-    end
-
-    always @(posedge clk) begin
-        if (conv_dest_write_en) begin
-            output_addr_offset = conv_dest_address - conv_dest_start_address;
-            output_row = output_addr_offset / output_col_size;
-            output_col = output_addr_offset % output_col_size;
-            output_mem[output_addr_offset] = conv_dest_writedata;
-            output_count = output_count + 1;
-
-            $fdisplay(trace_file,
-                "WRITE[%0d] time=%0tns address=%0d row=%0d col=%0d data=%04h state=%0d next_state=%0d start=%0b done=%0b src1_addr=%0d src1_data=%04h src2_addr=%0d src2_data=%04h dest_we=%0b i=%0d j=%0d m=%0d n=%0d product=%04h sum=%04h",
-                output_count,
-                $time,
-                conv_dest_address,
-                output_row,
-                output_col,
-                conv_dest_writedata,
-                uut.state,
-                uut.next_state,
-                conv_start,
-                conv_done,
-                conv_src1_address,
-                conv_src1_readdata,
-                conv_src2_address,
-                conv_src2_readdata,
-                conv_dest_write_en,
-                uut.i,
-                uut.j,
-                uut.m,
-                uut.n,
-                uut.product,
-                uut.sum);
-        end
     end
 
 endmodule

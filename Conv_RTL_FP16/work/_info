@@ -7,15 +7,15 @@ z2
 !i10e 25
 !i10f 100
 cModel Technology
-Z0 dD:/Huy/KLTN-MT_HTN/Neural_Processing_Unit_on_FPGA_analysis/Conv_RTL_FP16
+Z0 dD:/Huy/KLTN-MT_HTN/Neural_Processing_Unit_on_FPGA_v2/Conv_RTL_FP16
 vfloatAdd
-Z1 !s110 1783786609
+Z1 !s110 1784430549
 !i10b 1
 !s100 z=WHPYQbK>MzFWMG5mC6g0
 IzHaAkD3ULj8FE?cYkMiS53
 Z2 VDg1SIo80bB@j0V0VzS_@n1
 R0
-Z3 w1783177917
+Z3 w1784340178
 8FP16_ADD.v
 FFP16_ADD.v
 L0 1
@@ -23,7 +23,7 @@ Z4 OV;L;10.5b;63
 r1
 !s85 0
 31
-Z5 !s108 1783786609.000000
+Z5 !s108 1784430549.000000
 !s107 FP16_ADD.v|
 !s90 -reportprogress|300|-work|work|FP16_ADD.v|
 !i113 1
@@ -77,11 +77,11 @@ n@m10@k_sram
 vmatrix_conv
 R1
 !i10b 1
-!s100 Lkna4Tk>`[[WcoU?246F53
-I9JWEELgC98PiVDA<S9dVD1
+!s100 _CCIf6LDP?7`UQ@89k1c`2
+IJj^;g<Z70z3cHo4F]H:512
 R2
 R0
-w1783181348
+w1784340179
 8Conv.v
 FConv.v
 L0 1
@@ -98,11 +98,11 @@ R7
 vtb_conv
 R1
 !i10b 1
-!s100 kai]6lNimOL?ed9O83fOz1
-I2TR1hZgSe[kQ0UVMkPZ>X0
+!s100 ;ma8b=B[J667@FPd@8BNF0
+Ih[OA1E=^@>oc2h^d[djYk0
 R2
 R0
-w1783229097
+w1784430396
 8tb_conv.v
 Ftb_conv.v
 L0 3

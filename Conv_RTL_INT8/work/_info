@@ -7,37 +7,57 @@ z2
 !i10e 25
 !i10f 100
 cModel Technology
-Z0 dD:/Huy/KLTN-MT_HTN/Neural_Processing_Unit_on_FPGA_analysis/Conv_RTL_INT8
-vint8Add
-Z1 !s110 1783786955
+Z0 dD:/Huy/KLTN-MT_HTN/Neural_Processing_Unit_on_FPGA_v2/Conv_RTL_INT8
+vconv_layer
+Z1 !s110 1784436417
 !i10b 1
-!s100 D?>VdSjfH@1@1<nf`17F52
-IKlnGaC8j8L2Toad9He`6=1
+!s100 5YjIKQRU8ZOj5:9dVl^g60
+ID9koWP[R<G3CPjZVF4_5:0
 Z2 VDg1SIo80bB@j0V0VzS_@n1
 R0
-w1783225411
-8INT8_ADD.v
-FINT8_ADD.v
+w1784391263
+8CONV_LAYER.v
+FCONV_LAYER.v
 L0 1
 Z3 OV;L;10.5b;63
 r1
 !s85 0
 31
-Z4 !s108 1783786955.000000
-!s107 INT8_ADD.v|
-!s90 -reportprogress|300|-work|work|INT8_ADD.v|
+Z4 !s108 1784436417.000000
+!s107 CONV_LAYER.v|
+!s90 -reportprogress|300|-work|work|CONV_LAYER.v|
 !i113 1
 Z5 o-work work
 Z6 tCvgOpt 0
-nint8@add
-vint8Mult
+vint8_add
 R1
 !i10b 1
-!s100 dk35igNHIE2AkKB^84[hV1
-I7DG@W5i^D@kU45AYYkd]C2
+!s100 =jJ=??aWT56hPg`dZ1N3O0
+I8dd;4CWGedL<Dfo78J;?P3
 R2
 R0
-w1783225407
+w1784382283
+8INT8_ADD.v
+FINT8_ADD.v
+L0 1
+R3
+r1
+!s85 0
+31
+R4
+!s107 INT8_ADD.v|
+!s90 -reportprogress|300|-work|work|INT8_ADD.v|
+!i113 1
+R5
+R6
+vint8_mult
+R1
+!i10b 1
+!s100 dK_Obkl3=hOWY>XJI3enK1
+I@X41:1^]zN>3:Kolb3go53
+R2
+R0
+w1784382281
 8INT8_MULT.v
 FINT8_MULT.v
 L0 1
@@ -51,37 +71,14 @@ R4
 !i113 1
 R5
 R6
-nint8@mult
-vM10K_sram
-R1
-!i10b 1
-!s100 6CbG2DdenBHEX8eoAC8H<0
-IBa2cb0LdkY9mK<7cZNhQO3
-R2
-R0
-w1783255897
-8sram.v
-Fsram.v
-L0 1
-R3
-r1
-!s85 0
-31
-R4
-!s107 sram.v|
-!s90 -reportprogress|300|-work|work|sram.v|
-!i113 1
-R5
-R6
-n@m10@k_sram
 vmatrix_conv
 R1
 !i10b 1
-!s100 glIBz13XZm?_=YIU3g0110
-I_SfH`@aMaLFO5N>APVOib2
+!s100 nkCnBJa2PZ1RnNRlZOhAS3
+IADzN>IR7APDfZ_GCUO^hf2
 R2
 R0
-w1783758191
+w1784435788
 8Conv.v
 FConv.v
 L0 1
@@ -95,24 +92,66 @@ R4
 !i113 1
 R5
 R6
-vtb_conv
+vpost_process
 R1
 !i10b 1
-!s100 `bj[`bYHMde<l?3bag^i82
-IcQcRUml`ojQSkALfWkizl3
+!s100 8_9o33i7KfeN=gi^kN:4H1
+I1bMU9[=b98XHS;=_NK:T20
 R2
 R0
-w1783757374
-8tb_conv.v
-Ftb_conv.v
+w1784388730
+8POST_PROCESS.v
+FPOST_PROCESS.v
+L0 1
+R3
+r1
+!s85 0
+31
+R4
+!s107 POST_PROCESS.v|
+!s90 -reportprogress|300|-work|work|POST_PROCESS.v|
+!i113 1
+R5
+R6
+vsram_int8
+R1
+!i10b 1
+!s100 edJ6oY<kHnTQnCQe9mCkb2
+IFO;i0P^AR_dC27JnMUFYj1
+R2
+R0
+w1784396325
+8sram_int8.v
+Fsram_int8.v
+L0 1
+R3
+r1
+!s85 0
+31
+R4
+!s107 sram_int8.v|
+!s90 -reportprogress|300|-work|work|sram_int8.v|
+!i113 1
+R5
+R6
+vtb_conv_layer
+R1
+!i10b 1
+!s100 G6E4Xl1ZJ[KN2AoIIVi_S0
+I1W<TkfK=bcSjE807nF?0:1
+R2
+R0
+w1784396327
+8tb_conv_layer.v
+Ftb_conv_layer.v
 L0 3
 R3
 r1
 !s85 0
 31
 R4
-!s107 tb_conv.v|
-!s90 -reportprogress|300|-work|work|tb_conv.v|
+!s107 tb_conv_layer.v|
+!s90 -reportprogress|300|-work|work|tb_conv_layer.v|
 !i113 1
 R5
 R6

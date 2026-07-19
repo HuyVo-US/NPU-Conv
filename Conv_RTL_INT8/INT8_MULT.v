@@ -1,10 +1,9 @@
-module int8Mult
-(
-    input wire signed [7:0] intA,
-    input wire signed [7:0] intB,
+module int8_mult (
+    input wire signed [7:0] input_value,
+    input wire signed [7:0] kernel_value,
     output wire signed [15:0] product
 );
 
-assign product = intA * intB;
+    assign product = input_value * kernel_value;
 
 endmodule

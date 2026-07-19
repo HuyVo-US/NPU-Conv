@@ -1,1 +1,134 @@
-# do run_tb_conv.do
+# do run_conv.do
+# 
+# ModelSim 10.5b does not expose the active macro path through [info script].
+# Accept execution from this folder or from the workspace root.
+# if {![file exists FP16_ADD.v]} {
+#     if {[file exists Conv_RTL_FP16/FP16_ADD.v]} {
+#         cd Conv_RTL_FP16
+#     } else {
+#         error "Run run_conv.do from Conv_RTL_FP16 or its parent workspace"
+#     }
+# }
+# 
+# if {![file exists work]} {
+#     vlib work
+# }
+# vmap work work
+# Model Technology ModelSim - Intel FPGA Edition vmap 10.5b Lib Mapping Utility 2016.10 Oct  5 2016
+# vmap work work 
+# Copying D:/intelFPGA_lite/18.1/modelsim_ase/win32aloem/../modelsim.ini to modelsim.ini
+# Modifying modelsim.ini
+# 
+# Compile dependencies before the DUT and testbench.
+# vlog -work work FP16_ADD.v
+# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+# Start time: 10:06:47 on Jul 19,2026
+# vlog -work work FP16_ADD.v 
+# -- Compiling module floatAdd
+# 
+# Top level modules:
+# 	floatAdd
+# End time: 10:06:47 on Jul 19,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -work work FP16_MULT.v
+# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+# Start time: 10:06:47 on Jul 19,2026
+# vlog -work work FP16_MULT.v 
+# -- Compiling module floatMult
+# 
+# Top level modules:
+# 	floatMult
+# End time: 10:06:47 on Jul 19,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -work work sram.v
+# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+# Start time: 10:06:47 on Jul 19,2026
+# vlog -work work sram.v 
+# -- Compiling module M10K_sram
+# 
+# Top level modules:
+# 	M10K_sram
+# End time: 10:06:47 on Jul 19,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -work work Conv.v
+# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+# Start time: 10:06:47 on Jul 19,2026
+# vlog -work work Conv.v 
+# -- Compiling module matrix_conv
+# 
+# Top level modules:
+# 	matrix_conv
+# End time: 10:06:47 on Jul 19,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -work work tb_conv.v
+# Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+# Start time: 10:06:47 on Jul 19,2026
+# vlog -work work tb_conv.v 
+# -- Compiling module tb_conv
+# 
+# Top level modules:
+# 	tb_conv
+# End time: 10:06:48 on Jul 19,2026, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+# 
+# vsim -voptargs=+acc work.tb_conv
+# vsim -voptargs="+acc" work.tb_conv 
+# Start time: 10:06:48 on Jul 19,2026
+# Loading work.tb_conv
+# Loading work.matrix_conv
+# Loading work.floatMult
+# Loading work.floatAdd
+# Loading work.M10K_sram
+# 
+# view wave
+# delete wave *
+# delete wave not supported in batch mode
+# 
+# add wave -divider {CLOCK AND CONTROL}
+# add wave sim:/tb_conv/clk
+# add wave sim:/tb_conv/clk_300
+# add wave sim:/tb_conv/reset
+# add wave sim:/tb_conv/conv_start
+# add wave sim:/tb_conv/conv_done
+# 
+# add wave -divider {FSM AND POSITIONS}
+# add wave -radix unsigned sim:/tb_conv/uut/state
+# add wave -radix unsigned sim:/tb_conv/uut/next_state
+# add wave -label output_row -radix unsigned sim:/tb_conv/uut/m
+# add wave -label output_col -radix unsigned sim:/tb_conv/uut/n
+# add wave -label kernel_row -radix unsigned sim:/tb_conv/uut/i
+# add wave -label kernel_col -radix unsigned sim:/tb_conv/uut/j
+# 
+# add wave -divider {SOURCE 1 INPUT}
+# add wave -radix unsigned sim:/tb_conv/conv_src1_address
+# add wave -radix hexadecimal sim:/tb_conv/sram_src1_readdata
+# add wave -radix hexadecimal sim:/tb_conv/conv_src1_readdata
+# 
+# add wave -divider {SOURCE 2 KERNEL}
+# add wave -radix unsigned sim:/tb_conv/conv_src2_address
+# add wave -radix hexadecimal sim:/tb_conv/sram_src2_readdata
+# add wave -radix hexadecimal sim:/tb_conv/conv_src2_readdata
+# add wave -radix hexadecimal sim:/tb_conv/debug_kernel_value
+# 
+# add wave -divider {FP16 ARITHMETIC}
+# add wave -radix hexadecimal sim:/tb_conv/uut/product
+# add wave -radix hexadecimal sim:/tb_conv/uut/sum
+# add wave -radix hexadecimal sim:/tb_conv/uut/sum_plus_product
+# 
+# add wave -divider {DESTINATION OUTPUT}
+# add wave -radix unsigned sim:/tb_conv/conv_dest_address
+# add wave -radix hexadecimal sim:/tb_conv/conv_dest_writedata
+# add wave sim:/tb_conv/conv_dest_write_en
+# 
+# configure wave -namecolwidth 260
+# configure wave not supported in batch mode
+# configure wave -valuecolwidth 140
+# configure wave not supported in batch mode
+# update
+# 
+# run -all
+# Convolution logs written: conv_input.hex, conv_kernel.hex, conv_output.hex, conv_internal_process.log
+# ** Note: $finish    : tb_conv.v(303)
+#    Time: 148938 ns  Iteration: 1  Instance: /tb_conv
+# End time: 10:06:49 on Jul 19,2026, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0

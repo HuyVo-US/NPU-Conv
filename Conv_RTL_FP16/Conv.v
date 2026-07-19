@@ -148,7 +148,8 @@ module matrix_conv(
             end
 
             CALC: begin
-				sum <= sum_plus_product;
+//               sum <= sum + src1_readdata * kernel[i][j]; // sum
+                sum <= sum_plus_product;
                 if(j == src2_row_size - 1 ) begin
                     j<=0;
                     if(i == src2_row_size - 1) begin
